@@ -20,7 +20,7 @@ That makes the DLL that will host the component(s).
 
 By default the ATL Wizard creates a DLL that supports registration for COM usage the traditional way. Let’s disable that before proceeding, since the build process automatically registers the DLL and any components it implements. Open the RegFreeCpp.def source file and comment-out DllRegisterServer, DllUnregisterServer and DllInstall, as shown here with semi-colons on those lines:
 
-'''c
+```c
 ; RegFreeCpp.def : Declares the module parameters.
 
 LIBRARY
@@ -32,7 +32,7 @@ EXPORTS
 	;DllUnregisterServer	PRIVATE
 	;DllInstall		        PRIVATE
 
-'''
+```
 
 Let’s now make some updates to the project:
 
@@ -159,21 +159,21 @@ Do a build and notice RegFreeCpp.manifest in the output folder. It should look l
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
 	<file name="RegFreeCpp.dll" hashalg="SHA1">
 		<comClass 
-clsid="{04F2A6EF-F2EE-4C33-A65E-7C02A1C9BDB5}" 
-tlbid="{EB8D811E-FD0F-448A-A908-864EAAE142C3}">
-</comClass>
+            clsid="{04F2A6EF-F2EE-4C33-A65E-7C02A1C9BDB5}" 
+            tlbid="{EB8D811E-FD0F-448A-A908-864EAAE142C3}">
+        </comClass>
 		<typelib 
-tlbid="{EB8D811E-FD0F-448A-A908-864EAAE142C3}" 
-version="1.0" 
-helpdir="" 
-flags="HASDISKIMAGE">
-</typelib>
+            tlbid="{EB8D811E-FD0F-448A-A908-864EAAE142C3}" 
+            version="1.0" 
+            helpdir="" 
+            flags="HASDISKIMAGE">
+        </typelib>
 	</file>
 	<comInterfaceExternalProxyStub 
-name="IMyDebugOutput" 
-iid="{26F75A2A-D3F8-4E54-A12C-899316EB3116}" 
-tlbid="{EB8D811E-FD0F-448A-A908-864EAAE142C3}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}">
-</comInterfaceExternalProxyStub>
+        name="IMyDebugOutput" 
+        iid="{26F75A2A-D3F8-4E54-A12C-899316EB3116}" 
+        tlbid="{EB8D811E-FD0F-448A-A908-864EAAE142C3}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}">
+    </comInterfaceExternalProxyStub>
 </assembly>
 ```
 
