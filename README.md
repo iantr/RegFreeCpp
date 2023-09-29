@@ -19,3 +19,17 @@ Start by creating a new C++ ATL Project named RegFreeCpp.
 That makes the DLL that will host the component(s).
 
 By default the ATL Wizard creates a DLL that supports registration for COM usage the traditional way. Let’s disable that before proceeding, since the build process automatically registers the DLL and any components it implements. Open the RegFreeCpp.def source file and comment-out DllRegisterServer, DllUnregisterServer and DllInstall, as shown here with semi-colons on those lines:
+
+'''
+; RegFreeCpp.def : Declares the module parameters.
+
+LIBRARY
+
+EXPORTS
+	DllCanUnloadNow		    PRIVATE
+	DllGetClassObject	    PRIVATE
+	;DllRegisterServer	    PRIVATE
+	;DllUnregisterServer	PRIVATE
+	;DllInstall		        PRIVATE
+
+'''
