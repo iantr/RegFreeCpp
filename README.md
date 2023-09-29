@@ -55,6 +55,7 @@ The other important Linker setting to change is generating a manifest for the ex
 Try building the project – it should build now.
 
 Let’s create a COM component to live in the DLL. For this sample we’ll just create a simple object that outputs a string to the system debug output. 
+
 To the RegFreeCpp project, add a new item:
 
 ![Create a COM component](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture7.png "Create a COM component")
@@ -86,6 +87,7 @@ You may need to build the project to get all the nodes as displayed here. When a
 The project should build. If not, revisit the Class View node that you added the method to.
 
 For the implementation of WriteLine in MyDebugOutput.cpp, lets use some STL. You might as well include the needed STL headers in the pre-compiled headers, so add #include <string> to pch.h.
+
 Let’s start with the essential message code, like this:
 
 ```cpp
@@ -107,6 +109,7 @@ STDMETHODIMP CMyDebugOutput::WriteLine(BSTR Message)
 ```
 
 Now let’s make the error case nicer for .NET environments by added an IErrorInfo message. ATL’s helper function, AtlReportError, does this quite nicely and forces you to do it right by requiring the error message to be in the DLL’s string resources. Let’s add the error message there. 
+
 Open the Resource View and then open the String Table that’s already been created, as shown here:
 
 ![Add a string resource](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture13.png "Create the WriteLine method error message string")
@@ -142,6 +145,7 @@ STDMETHODIMP CMyDebugOutput::WriteLine(BSTR Message)
 ```
 
 Next up is to create the COM manifest so clients can instantiate the component as an Isolated COM aka registry-free component usage style application.
+
 Create RegFreeCpp.manifest in the settings for the project by adding a post-build event that runs the Windows SDK Manifest Tool (mt.exe), as shown here:
 
 ![Create a COM manifest](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture15.png "Create the manifest file so the COM object can be instantiated")
@@ -247,6 +251,7 @@ int main()
 ```
 
 The last thing we need to do is incorporate the RegFreeCpp.manifest file into the project. 
+
 This is done in the project settings Manifest area’s Input and Output section, adding the following to the Additional Manifest Files entry:
 
 ```
@@ -264,6 +269,7 @@ If you want to see the output while not running in a debugger, you could use the
 ## C# Test Application
 
 Let’s make a C# .NET Framework test application. Add a C# Console App (.NET Framework) project to the solution and let’s name it DotNetFrameworkTest.
+
 A .NET app needs a manifest so it can be augmented to reference the COM object’s manifest: RegFreeCpp.manifest in this case. To the DotNetFrameworkTest app, add a manifest:
 
 ![Add a manifest](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture20.png)
@@ -340,4 +346,5 @@ namespace DotNetFrameworkTest
 ```
 
 Run the program. It should succeed. In my testing, the debug output did not go to the Debug window in Visual Studio. I ran Debug View from SysInternals and saw the output that way. 
+
 You can test the error handling by passing null to the WriteLine method and see the exception be thrown and the error message from the RegFreeCpp’s resources be displayed.
