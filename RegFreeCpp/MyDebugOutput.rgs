@@ -1,0 +1,16 @@
+HKCR
+{
+	NoRemove CLSID
+	{
+		ForceRemove {04f2a6ef-f2ee-4c33-a65e-7c02a1c9bdb5} = s 'MyDebugOutput class'
+		{
+			ForceRemove Programmable
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			TypeLib = s '{eb8d811e-fd0f-448a-a908-864eaae142c3}'
+			Version = s '1.0'
+		}
+	}
+}

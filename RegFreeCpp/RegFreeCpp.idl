@@ -1,0 +1,38 @@
+// RegFreeCpp.idl : IDL source for RegFreeCpp
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (RegFreeCpp.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(26f75a2a-d3f8-4e54-a12c-899316eb3116),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IMyDebugOutput : IDispatch
+{
+	
+	[id(1), helpstring("Send message to system debug output")] HRESULT WriteLine([in] BSTR Message);
+};
+[
+	uuid(eb8d811e-fd0f-448a-a908-864eaae142c3),
+	version(1.0),
+]
+library RegFreeCppLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(04f2a6ef-f2ee-4c33-a65e-7c02a1c9bdb5)
+	]
+	coclass MyDebugOutput
+	{
+		[default] interface IMyDebugOutput;
+	};
+};
+
+import "shobjidl.idl";
