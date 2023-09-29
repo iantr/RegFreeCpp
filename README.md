@@ -20,7 +20,7 @@ That makes the DLL that will host the component(s).
 
 By default the ATL Wizard creates a DLL that supports registration for COM usage the traditional way. Let’s disable that before proceeding, since the build process automatically registers the DLL and any components it implements. Open the RegFreeCpp.def source file and comment-out DllRegisterServer, DllUnregisterServer and DllInstall, as shown here with semi-colons on those lines:
 
-'''
+'''c
 ; RegFreeCpp.def : Declares the module parameters.
 
 LIBRARY
@@ -33,3 +33,147 @@ EXPORTS
 	;DllInstall		        PRIVATE
 
 '''
+
+Let’s now make some updates to the project:
+
+Set C++ 20 and Warning Level 4. Start off with a good foundation. Be sure to select All Configurations and All Platforms first, then adjust the C++ Language Standard to be ISO C++ 20. This gives you access to newer handy STL classes such as std::string_view, std::format and std::filesystem.
+
+![Project language settings](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture3.png "Set the project to use C++ 20")
+
+Let’s set the warning level to 4 to keep the code safe as its developed:
+
+![Project compiler warning settings](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture4.png "Set the project to use warning level 4")
+
+Since we don’t want to have the COM components registered from this DLL, let’s turn off link-time registration. The Register Output option is found on the General tab of the Linker settings:
+
+![Project settings to not register the COM object](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture5.png "Turn off COM object registration")
+
+The other important Linker setting to change is generating a manifest for the executable. Having this present will prevent the DLL from being loaded in a .NET project via reg-free COM. We will add a COM-related manifest later.
+
+![Project settings to not create a manifest for the DLL](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture6.png "Turn off executable manifest creation")
+
+Try building the project – it should build now.
+
+Let’s create a COM component to live in the DLL. For this sample we’ll just create a simple object that outputs a string to the system debug output. 
+To the RegFreeCpp project, add a new item:
+
+![Create a COM component](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture7.png "Create a COM component")
+
+Using the ATL Simple Object wizard is highly recommended:
+
+![ATL Simple Object wizard](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture8.png "Create a COM component")
+
+The defaults suggested for the Names are find for this sample. Don’t press Finish yet – there’s important options on the Other tab.
+
+![ATL Simple Object other settings](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture9.png "Create a COM component with threading model 'Both'")
+
+Selecting Both for the threading model supports easy usage and especially debugging. Select that unless you have a specific need otherwise.
+
+For elegant integration into .NET environments, select ISupportErrorInfo. This allows for errors with descriptive messages to be surfaced as exceptions in C# applications.
+
+![ATL Simple Object other settings](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture10.png "Create a COM component with threading model 'Both'")
+
+Now press Finish to add this component to the DLL.
+
+Let’s add a method to the MyDebugOutput component’s interface. This is best and most easily done using the Visual Studio Class View. Select the IMyDebugOutput interface in the RegFreeCpp project within Class View, right-click to Add a new Method, as shown here:
+
+![Add a method to the object](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture11.png "Create the WriteLine method")
+
+You may need to build the project to get all the nodes as displayed here. When adding the method it’s important to select the correct IMyDebugOutput node. Two identical nodes are displayed. The one you don’t want is the one with the tooltip for the icon that says ‘_interface IMyDebugNode’.  
+
+![Add a method to the object](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture12.png "Create the WriteLine method")
+
+The project should build. If not, revisit the Class View node that you added the method to.
+
+For the implementation of WriteLine in MyDebugOutput.cpp, lets use some STL. You might as well include the needed STL headers in the pre-compiled headers, so add #include <string> to pch.h.
+Let’s start with the essential message code, like this:
+
+```cpp
+STDMETHODIMP CMyDebugOutput::WriteLine(BSTR Message)
+{
+	if (nullptr == Message)
+		return E_INVALIDARG;
+
+	std::wstring message(OLE2CW(Message)); // Cast the BSTR to a wchar_t string
+
+	// Help the caller in case they didn't add a carriage return
+	if (L'\n' != message.back()) 
+		message.append(L"\n");
+
+	OutputDebugString(message.c_str());
+
+	return S_OK;
+}
+```
+
+Now let’s make the error case nicer for .NET environments by added an IErrorInfo message. ATL’s helper function, AtlReportError, does this quite nicely and forces you to do it right by requiring the error message to be in the DLL’s string resources. Let’s add the error message there. 
+Open the Resource View and then open the String Table that’s already been created, as shown here:
+
+![Add a string resource](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture13.png "Create the WriteLine method error message string")
+
+Add a string as shown here:
+
+![Add a string resource](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture14.png "Create the WriteLine method error message string")
+
+To reference the message, you’ll need to add #include “resource.h” to MyDebugOutput.cpp.
+
+The implementation of WriteMessage can be updated as follows, adding the call to AtlReportError. Note the message ID passed: IDS_MESSAGE_NULL, from resource.h.
+
+```cpp
+STDMETHODIMP CMyDebugOutput::WriteLine(BSTR Message)
+{
+	if (nullptr == Message)
+	{
+		AtlReportError(CLSID_MyDebugOutput, IDS_MESSAGE_NULL, IID_IMyDebugOutput, E_INVALIDARG);
+	
+		return E_INVALIDARG;
+	}
+
+	std::wstring message(OLE2CW(Message)); // Cast the BSTR to a wchar_t string
+
+	// Help the caller in case they didn't add a carriage return
+	if (L'\n' != message.back()) 
+		message.append(L"\n");
+
+	OutputDebugString(message.c_str());
+
+	return S_OK;
+} 
+```
+
+Next up is to create the COM manifest so clients can instantiate the component as an Isolated COM aka registry-free component usage style application.
+Create RegFreeCpp.manifest in the settings for the project by adding a post-build event that runs the Windows SDK Manifest Tool (mt.exe), as shown here:
+
+![Create a COM manifest](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture15.png "Create the manifest file so the COM object can be instantiated")
+
+The Command Line is set to:
+
+```
+mt.exe -out:$(OutDir)RegFreeCpp.manifest -tlb:$(IntDirFullPath)RegFreeCpp.tlb -dll:RegFreeCpp.dll -rgs:$(ProjectDir)RegFreeCpp.rgs
+```
+
+Do a build and notice RegFreeCpp.manifest in the output folder. It should look like this:
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+	<file name="RegFreeCpp.dll" hashalg="SHA1">
+		<comClass 
+clsid="{04F2A6EF-F2EE-4C33-A65E-7C02A1C9BDB5}" 
+tlbid="{EB8D811E-FD0F-448A-A908-864EAAE142C3}">
+</comClass>
+		<typelib 
+tlbid="{EB8D811E-FD0F-448A-A908-864EAAE142C3}" 
+version="1.0" 
+helpdir="" 
+flags="HASDISKIMAGE">
+</typelib>
+	</file>
+	<comInterfaceExternalProxyStub 
+name="IMyDebugOutput" 
+iid="{26F75A2A-D3F8-4E54-A12C-899316EB3116}" 
+tlbid="{EB8D811E-FD0F-448A-A908-864EAAE142C3}" proxyStubClsid32="{00020424-0000-0000-C000-000000000046}">
+</comInterfaceExternalProxyStub>
+</assembly>
+```
+
