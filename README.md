@@ -12,9 +12,9 @@ This project uses Visual Studio 2022.
 
 Start by creating a new C++ ATL Project named RegFreeCpp.
 
-![Create C++ ATL Project](https://github.com/iantr/RegFreeCpp/doc/Picture1.png "Create C++ ATL Project")
+![Create C++ ATL Project](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture1.png "Create C++ ATL Project")
 
-![ATL Project Properties](https://github.com/iantr/RegFreeCpp/doc/Picture1.png "Set the ATL project properties")
+![ATL Project Properties](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture2.png "Set the ATL project properties")
 
 That makes the DLL that will host the component(s).
 
