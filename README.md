@@ -317,7 +317,9 @@ copy "$(SolutionDir)x64\$(ConfigurationName)\RegFreeCpp.manifest".
 
 Build the C# project so the Interop DLL get generated.
 
+
 Now add a reference to the generated Interop.RegFreeCpp.dll in the project directory. 
+
 
 We can finally add some code. Change Program.cs to the following:
 
