@@ -1,5 +1,5 @@
 # RegFreeCpp
-Sample Reg-Free C++ COM Component with Isolated COM C++ and C# Test Apps
+## Sample Reg-Free C++ COM Component with Isolated COM C++ and C# Test Apps
 
 The purpose of the RegFreeCpp project is to show how to create a COM component in C++ and then use it without registration or "reg-free" in both a C++ Isolated COM app and a C# app. I found the documentation to be lacking so I'm putting this sample out there along with detailed instructions so other folks might have an easier time.
 
@@ -64,7 +64,7 @@ Using the ATL Simple Object wizard is highly recommended:
 
 ![ATL Simple Object wizard](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture8.png "Create a COM component")
 
-The defaults suggested for the Names are find for this sample. Don’t press Finish yet – there’s important options on the Other tab.
+The defaults suggested for the Names are fine for this sample. Don’t press Finish yet – there’s important options on the Other tab.
 
 ![ATL Simple Object other settings](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture9.png "Create a COM component with threading model 'Both'")
 
@@ -315,7 +315,10 @@ copy "$(SolutionDir)x64\$(ConfigurationName)\RegFreeCpp.dll".
 copy "$(SolutionDir)x64\$(ConfigurationName)\RegFreeCpp.manifest".
 ```
 
-Now add a reference to the generated Interop.RegFreeCpp.dll in the project directory.
+Build the C# project so the Interop DLL get generated.
+
+Now add a reference to the generated Interop.RegFreeCpp.dll in the project directory. 
+
 We can finally add some code. Change Program.cs to the following:
 
 ```C#
