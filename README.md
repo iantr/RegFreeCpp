@@ -6,7 +6,7 @@ The purpose of the RegFreeCpp project is to show how to create a COM component i
 There are three projects in the solution:
 - RegFreeCpp - this is a simple C++ ATL-based COM object that just prints a message to the sytem debug output.
 - CppTest - this is a simple Isolated COM C++ app that instantiates the RegFreeCpp component can calls its single method
-- DotNetFrameworkTest - this is a C# .NET Framework console app that also instantiates the RegFreeCpp component can calls its single method
+- DotNetFrameworkTest - this is a C# .NET Framework console app that also instantiates the RegFreeCpp component and calls its single method
 
 This project uses Visual Studio 2022.
 
@@ -86,7 +86,7 @@ You may need to build the project to get all the nodes as displayed here. When a
 
 The project should build. If not, revisit the Class View node that you added the method to.
 
-For the implementation of WriteLine in MyDebugOutput.cpp, lets use some STL. You might as well include the needed STL headers in the pre-compiled headers, so add #include <string> to pch.h.
+For the implementation of WriteLine in MyDebugOutput.cpp, lets use some STL. You might as well include the needed STL headers in the pre-compiled headers, so add ```#include <string>``` to pch.h.
 
 Let’s start with the essential message code, like this:
 
@@ -182,7 +182,7 @@ Do a build and notice RegFreeCpp.manifest in the output folder. It should look l
 ```
 
 ## C++ Test Application
-It’s time to test it! Let’s start with a C++ console app. To the solution, add a new C++ console app. Let’s call it CppTest. 
+It’s time to test it! Let’s start with a C++ console app. To the solution add a new C++ console app. Let’s call it CppTest. 
 
 ![Create a C++ Console app](https://github.com/iantr/RegFreeCpp/blob/main/doc/Picture16.png)
 
@@ -268,7 +268,7 @@ If you want to see the output while not running in a debugger, you could use the
 
 ## C# Test Application
 
-Let’s make a C# .NET Framework test application. Add a C# Console App (.NET Framework) project to the solution and let’s name it DotNetFrameworkTest.
+Let’s make a C# .NET Framework test application. Add a C# Console App (.NET Framework) project to the solution and name it DotNetFrameworkTest.
 
 A .NET app needs a manifest so it can be augmented to reference the COM object’s manifest: RegFreeCpp.manifest in this case. To the DotNetFrameworkTest app, add a manifest:
 
@@ -350,6 +350,6 @@ namespace DotNetFrameworkTest
 }
 ```
 
-Run the program. It should succeed. In my testing, the debug output did not go to the Debug window in Visual Studio. I ran Debug View from SysInternals and saw the output that way. 
+Run the program. It should succeed. In my testing, the debug output did not go to the Debug window in Visual Studio. I used Debug View from SysInternals and saw the output that way. 
 
-You can test the error handling by passing null to the WriteLine method and see the exception be thrown and the error message from the RegFreeCpp’s resources be displayed.
+You can test the error handling by passing null to the WriteLine method and see an exception be thrown. The error message from the RegFreeCpp DLL's resources be displayed.
